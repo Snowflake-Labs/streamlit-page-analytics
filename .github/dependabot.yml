@@ -1,0 +1,75 @@
+# Copyright 2025 Snowflake Inc
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Dependabot configuration for automatic dependency updates
+version: 2
+updates:
+  # Python dependencies (pip)
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "UTC"
+    # Limit the number of open pull requests to ensure single PRs
+    open-pull-requests-limit: 1
+    # Group updates - combine all related changes into single PRs
+    groups:
+      # Group all Python dependencies together
+      all-python-dependencies:
+        patterns:
+          - "*"
+        update-types:
+          - "major"
+          - "minor"
+    # Assign reviewers and labels
+    reviewers:
+      - "sf-gh-adamle"
+    labels:
+      - "dependencies"
+      - "automated"
+    # Commit message configuration
+    commit-message:
+      prefix: "deps"
+      prefix-development: "deps-dev"
+      include: "scope"
+
+  # GitHub Actions dependencies
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "UTC"
+    # Limit the number of open pull requests to ensure single PRs
+    open-pull-requests-limit: 1
+    # Group all GitHub Actions updates together
+    groups:
+      all-github-actions:
+        patterns:
+          - "*"
+        update-types:
+          - "major"
+          - "minor"
+    reviewers:
+      - "sf-gh-adamle"
+    labels:
+      - "github-actions"
+      - "dependencies"
+      - "automated"
+    commit-message:
+      prefix: "ci"
+      include: "scope"

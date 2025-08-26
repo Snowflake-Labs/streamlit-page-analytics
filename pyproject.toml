@@ -1,0 +1,177 @@
+[build-system]
+requires = ["setuptools >= 77.0.3", "setuptools_scm[toml]"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "streamlit-page-analytics"
+description = "A Python library for page analytics in Streamlit applications using logs"
+readme = "README.md"
+keywords = [
+    "page analytics",
+    "streamlit",
+    "logging analytics"
+]
+
+dynamic = ["version"]
+
+authors = [
+  { name="Anant Damle", email="13331827+anantdamle@users.noreply.github.com" },
+]
+
+requires-python = ">=3.10"
+
+license-files = ["LICENSE", "AUTHORS"]
+
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+
+    "Intended Audience :: Developers",
+
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+
+    "License :: OSI Approved :: Apache Software License",
+
+    "Operating System :: OS Independent",
+]
+
+dependencies = [
+    "streamlit >= 1.0",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/Snowflake-Labs/streamlit-page-analytics"
+"Bug Tracker" = "https://github.com/Snowflake-Labs/streamlit-page-analytics/issues"
+
+[tool.setuptools.packages.find]
+include = ["streamlit_page_analytics*"]
+exclude = ["tests*", "scripts*", "examples*", "docs*"]
+
+[tool.setuptools.package-data]
+"streamlit_page_analytics" = ["py.typed"]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-mock>=3.12.0",  # Added for mocking in tests
+    "black>=25.1.0",
+    "pre-commit>=3.6.0",  # Added for pre-commit hooks
+    "build"
+]
+
+[tool.setuptools_scm]
+# Automatically derive version from git tags and commits
+write_to = "streamlit_page_analytics/_version.py"
+
+# =============================================================================
+# Linting and Code Quality Configuration
+# =============================================================================
+
+[tool.black]
+line-length = 88
+target-version = ['py310', 'py311', 'py312']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+  | __pycache__
+  | \.pytest_cache
+  | .*\.egg-info
+)/
+'''
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88
+known_first_party = ["streamlit_page_analytics"]
+extend_skip = [
+    ".git",
+    "dist",
+    "build",
+    "__pycache__",
+    "*.egg-info",
+    ".pytest_cache",
+    ".mypy_cache",
+    ".venv",
+    ".tox"
+]
+
+[tool.mypy]
+python_version = "3.10"  # Minimum supported version
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+exclude = [
+    "dist/.*",
+    "build/.*",
+    ".git/.*",
+    "__pycache__/.*",
+    ".*.egg-info/.*",
+    ".pytest_cache/.*",
+    ".mypy_cache/.*",
+    ".venv/.*",
+    ".tox/.*"
+]
+
+[[tool.mypy.overrides]]
+module = "streamlit.*"
+ignore_missing_imports = true
+
+[tool.pylint.messages_control]
+disable = [
+    "C0103",  # Invalid name
+    "C0114",  # Missing module docstring
+    "R0903",  # Too few public methods
+    "R0913",  # Too many arguments
+    "W0613",  # Unused argument
+    "W0621",  # Redefining name from outer scope (for pytest fixtures)
+]
+
+[tool.pylint.format]
+max-line-length = 88
+
+[tool.pylint.master]
+ignore = [
+    ".git",
+    "dist",
+    "build",
+    "__pycache__",
+    "*.egg-info",
+    ".pytest_cache",
+    ".mypy_cache",
+    ".venv",
+    ".tox"
+]
+
+[tool.bandit]
+exclude_dirs = ["tests"]
+skips = ["B101"]
+
+[tool.pydocstyle]
+inherit = false
+convention = "google"
+add-ignore = ["D100", "D104", "D213", "D215", "D400", "D401", "D404", "D406", "D407", "D408", "D409", "D413"]
+match-dir = "^(?!(.git|dist|build|__pycache__|.pytest_cache|.mypy_cache|.venv|.tox|.*.egg-info)).*$"

@@ -1,0 +1,17 @@
+include LICENSE
+include AUTHORS
+include README.md
+include pyproject.toml
+
+recursive-include streamlit_page_analytics *.py
+
+global-exclude *.py[cod] *.so *.dylib *.dll __pycache__ .DS_Store
+prune tests
+prune scripts
+prune examples
+prune docs
+prune .git
+prune .github
+prune dist
+prune build
+prune *.egg-info

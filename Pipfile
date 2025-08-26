@@ -1,0 +1,30 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+streamlit = ">=1.11.1"
+
+[dev-packages]
+build = "*"
+
+# Testing
+pytest = ">=7.0"
+pytest-cov = "*"
+
+# Linting
+black = ">=25.1.0"
+isort = "*"
+flake8 = "*"
+pylint = "*"
+mypy = "*"
+pydocstyle = "*"
+
+# Security
+vulture = "*"
+bandit = "*"
+pip-audit = "*"
+
+[requires]
+python_version = "3.10"

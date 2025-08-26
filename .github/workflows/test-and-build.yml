@@ -1,0 +1,164 @@
+# Copyright 2025 Snowflake Inc
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Test, Build and Lint
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test_lint:
+    name: Test and Lint
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+    - uses: actions/checkout@v5
+
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.10"
+
+    # Enhanced multi-layer caching strategy
+    - name: Cache pip packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/pyproject.toml', '**/Pipfile.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Cache pipenv virtualenv
+      uses: actions/cache@v4
+      with:
+        path: ~/.local/share/virtualenvs
+        key: ${{ runner.os }}-pipenv-${{ hashFiles('**/Pipfile.lock', '**/pyproject.toml') }}
+        restore-keys: |
+          ${{ runner.os }}-pipenv-
+
+    - name: Cache tool outputs
+      uses: actions/cache@v4
+      with:
+        path: |
+          .mypy_cache
+          .pytest_cache
+          .coverage
+        key: ${{ runner.os }}-tools-${{ hashFiles('**/*.py', '**/pyproject.toml') }}
+        restore-keys: |
+          ${{ runner.os }}-tools-
+
+    - name: Install dependencies
+      run: make install
+
+    - name: Run tests with coverage
+      run: make test-cov
+
+    - name: Upload coverage reports
+      uses: codecov/codecov-action@v4
+      if: always()
+      with:
+        file: ./coverage.xml
+        fail_ci_if_error: false
+
+    - name: Run linting suite
+      run: make lint
+      continue-on-error: true
+      id: lint_check
+
+  test_build_distribution:
+    name: Test Build Distribution
+    needs: test_lint
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v5
+
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.10"
+
+    # Reuse pip and pipenv caches from test job
+    - name: Cache pip packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/pyproject.toml', '**/Pipfile.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Cache pipenv virtualenv
+      uses: actions/cache@v4
+      with:
+        path: ~/.local/share/virtualenvs
+        key: ${{ runner.os }}-pipenv-${{ hashFiles('**/Pipfile.lock', '**/pyproject.toml') }}
+        restore-keys: |
+          ${{ runner.os }}-pipenv-
+
+    # Cache build artifacts and tools
+    - name: Cache build artifacts
+      uses: actions/cache@v4
+      with:
+        path: |
+          build/
+          *.egg-info/
+        key: ${{ runner.os }}-build-${{ hashFiles('**/pyproject.toml', '**/setup.py', '**/setup.cfg') }}
+        restore-keys: |
+          ${{ runner.os }}-build-
+
+    - name: Install dependencies
+      run: make install
+
+    - name: Build all distributions
+      run: make build-all
+
+    - name: Verify distributions
+      run: |
+        echo "✅ Build verification:"
+        ls -la dist/
+        echo ""
+        echo "File count: $(ls dist/ | wc -l)"
+        echo "Expected: 3 files (whl, zip, tar.gz)"
+
+        if [ $(ls dist/*.whl | wc -l) -eq 1 ]; then
+          echo "✅ Wheel file created"
+        else
+          echo "❌ Wheel file missing"
+          exit 1
+        fi
+
+        if [ $(ls dist/*.zip | wc -l) -eq 1 ]; then
+          echo "✅ ZIP file created"
+        else
+          echo "❌ ZIP file missing"
+          exit 1
+        fi
+
+        if [ $(ls dist/*.tar.gz | wc -l) -eq 1 ]; then
+          echo "✅ TAR.GZ file created"
+        else
+          echo "❌ TAR.GZ file missing"
+          exit 1
+        fi
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: distributions
+        path: dist/
+        retention-days: 7
