@@ -8,9 +8,20 @@ these logs can then be processed to derive analytics information.
 This solution is inspired from [jrieke/streamlit-analytics](https://github.com/jrieke/streamlit-analytics) idea.
 
 ## Installation
+Use the releases to download assets:
 
+### Local
+To run it locally, Download the wheel(`.whl`) file and install:
 ```bash
-pip install streamlit_page_analytics
+pip install streamlit_page_analytics-<version>-py3-none-any.whl
+```
+### Streamlit in Snowflake (SiS)
+Download the `streamlit_page_analytics-<version>.zip` file and copy it to a
+Snowflake Internal Stage for use in SiS and run the following command:
+
+```snowflake
+ALTER STREAMLIT <your-streamlit-name> SET 
+  IMPORTS = ('@<your-internal-stage>/<path/to/your/zip/file>');
 ```
 
 ## Usage
