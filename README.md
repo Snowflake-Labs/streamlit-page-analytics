@@ -11,9 +11,12 @@ This solution is inspired from [jrieke/streamlit-analytics](https://github.com/j
 Use the releases to download assets:
 
 ### Local
-To run it locally, Download the wheel(`.whl`) file and install:
+To run it locally, Download the wheel(`.whl`) file and install or
+install from git:
+
 ```bash
-pip install streamlit_page_analytics-<version>-py3-none-any.whl
+pip install \
+git+https://github.com/Snowflake-Labs/streamlit-page-analytics@latest
 ```
 ### Streamlit in Snowflake (SiS)
 Download the `streamlit_page_analytics-<version>.zip` file and copy it to a
