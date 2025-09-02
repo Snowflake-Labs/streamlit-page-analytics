@@ -77,6 +77,11 @@ The following Streamlit widgets are currently supported:
 - `st.file_uploader` - Change events
 - `st.color_picker` - Change events
 
+
+## Analytics Tables
+Use the sample [analytics script](dashboard/snowflake_views_dynamic_tables.sql) to setup analytics on top of the
+logs can be quickly built using dynamic tables.
+
 ## Disclaimer
 License: Apache 2.0
 
