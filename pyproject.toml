@@ -38,7 +38,7 @@ classifiers = [
 ]
 
 dependencies = [
-    "streamlit >= 1.0",
+    "streamlit >= 1.11.1",
 ]
 
 [project.urls]
@@ -53,12 +53,52 @@ exclude = ["tests*", "scripts*", "examples*", "docs*"]
 "streamlit_page_analytics" = ["py.typed"]
 
 [project.optional-dependencies]
+# All development dependencies
 dev = [
     "pytest>=7.0",
-    "pytest-mock>=3.12.0",  # Added for mocking in tests
+    "pytest-cov",
+    "pytest-mock>=3.12.0",
     "black>=25.1.0",
-    "pre-commit>=3.6.0",  # Added for pre-commit hooks
+    "isort",
+    "flake8",
+    "pylint",
+    "mypy",
+    "pydocstyle",
+    "vulture",
+    "bandit",
+    "pip-audit",
+    "pre-commit>=3.6.0",
     "build"
+]
+
+# Testing dependencies only
+test = [
+    "pytest>=7.0",
+    "pytest-cov",
+    "pytest-mock>=3.12.0",
+]
+
+# Linting and formatting dependencies only  
+lint = [
+    "black>=25.1.0",
+    "isort",
+    "flake8",
+    "pylint",
+    "mypy",
+    "pydocstyle",
+]
+
+# Security scanning dependencies
+security = [
+    "vulture",
+    "bandit", 
+    "pip-audit",
+]
+
+# Build and packaging dependencies
+build = [
+    "build",
+    "pre-commit>=3.6.0",
 ]
 
 [tool.setuptools_scm]

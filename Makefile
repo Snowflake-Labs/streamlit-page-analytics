@@ -5,29 +5,29 @@
 
 # Build wheel distribution
 build-wheel: clean
-	@echo "🔨 Building wheel distribution..."
-	pipenv run python -m build --wheel
+	@echo "Building wheel distribution..."
+	uv run python -m build --wheel
 
 # Build zip source distribution
 build-zip: clean
-	@echo "🔨 Building zip source distribution..."
+	@echo "Building zip source distribution..."
 	./scripts/make_zip_dist.sh
 
 # Build tar.gz source distribution
 build-tar: clean
-	@echo "🔨 Building tar.gz source distribution..."
-	pipenv run python -m build --sdist
+	@echo "Building tar.gz source distribution..."
+	uv run python -m build --sdist
 
 # Build all distributions
 build-all: clean
-	@echo "🔨 Building all distributions..."
-	pipenv run python -m build --wheel
-	pipenv run python -m build --sdist
+	@echo "Building all distributions..."
+	uv run python -m build --wheel
+	uv run python -m build --sdist
 	./scripts/make_zip_dist.sh
 
 # Default target
 help:
-	@echo "🚀 Streamlit Page Analytics Development Commands"
+	@echo "Streamlit Page Analytics Development Commands"
 	@echo ""
 	@echo "Available targets:"
 	@echo "  lint         - Run all linters on source and tests"
@@ -55,67 +55,63 @@ help:
 
 # Run comprehensive linting (matches CI)
 lint:
-	@echo "🔍 Running comprehensive linting suite..."
-	pipenv run python3 scripts/lint.py --source streamlit_page_analytics $(ARGS)
-	pipenv run python3 scripts/lint.py --source tests $(ARGS)
+	@echo "Running linting suite..."
+	./scripts/lint.sh --source streamlit_page_analytics $(ARGS)
+	./scripts/lint.sh --source tests $(ARGS)
 
 # Run linters with auto-fix
 lint-fix:
-	@echo "🔧 Running linters with auto-fix..."
-	-pipenv run python3 scripts/lint.py --source streamlit_page_analytics --fix
-	-pipenv run python3 scripts/lint.py --source tests --fix
-	@echo "✅ Linting completed. Fix any remaining issues manually."
+	@echo "Running linters with auto-fix..."
+	-./scripts/lint.sh --source streamlit_page_analytics --fix
+	-./scripts/lint.sh --source tests --fix
+	@echo "Linting completed. Fix any remaining issues manually."
 
 # Add/update license headers
 license:
-	@echo "📝 Adding/updating license headers..."
+	@echo "Adding/updating license headers..."
 	./scripts/add_license.sh
 
 # Run only fast linters for quick feedback
 lint-quick:
-	@echo "⚡ Running quick linters..."
-	pipenv run python3 scripts/lint.py --source streamlit_page_analytics --only black flake8 isort
-	pipenv run python3 scripts/lint.py --source tests --only black flake8 isort
+	@echo "Running quick linters..."
+	./scripts/lint.sh --source streamlit_page_analytics --only black flake8 isort
+	./scripts/lint.sh --source tests --only black flake8 isort
 
 # Install dependencies (matches CI environment)
 install:
-	@echo "📦 Installing dependencies..."
-	python -m pip install --upgrade pip
-	pip install pipenv
-	pipenv install --dev
-	pipenv run pip install -e .
+	@echo "Installing dependencies..."
+	uv sync --extra dev
 
 # Install Git hooks
 install-hooks:
-	@echo "🔧 Installing Git hooks..."
+	@echo "Installing Git hooks..."
 	./scripts/install-hooks.sh
 
 # Test pre-commit hook
 test-hooks:
-	@echo "🧪 Testing pre-commit hook..."
+	@echo "Testing pre-commit hook..."
 	@if [ -f .git/hooks/pre-commit ]; then \
 		echo "Running pre-commit hook test..."; \
 		./.git/hooks/pre-commit; \
 	else \
-		echo "❌ Pre-commit hook not found. Run 'make install-hooks' first."; \
+		echo "ERROR: Pre-commit hook not found. Run 'make install-hooks' first."; \
 		exit 1; \
 	fi
 
 # Run tests (matches CI environment)
 test:
-	@echo "🧪 Running tests..."
-	pipenv run pytest tests/ -v
+	@echo "Running tests..."
+	uv run pytest tests/ -v
 
 # Run tests with coverage
 test-cov:
-	@echo "🧪 Running tests with coverage..."
-	pipenv run pytest tests/ -v --cov=streamlit_page_analytics --cov-report=term-missing --cov-report=html --cov-report=xml
-	@echo "✅ Coverage report generated in HTML format at htmlcov/index.html"
-	@echo "✅ Coverage report generated in XML format at coverage.xml"
+	@echo "Running tests with coverage..."
+	uv run pytest tests/ -v --cov=streamlit_page_analytics --cov-report=term-missing --cov-report=html --cov-report=xml
+	@echo "Coverage reports: htmlcov/index.html, coverage.xml"
 
 # Clean build artifacts and caches
 clean:
-	@echo "🧹 Cleaning build artifacts and caches..."
+	@echo "Cleaning build artifacts and caches..."
 	rm -rf build/
 	rm -rf dist/
 	rm -rf *.egg-info/
@@ -132,12 +128,12 @@ clean:
 	find . -type f -name "coverage.xml" -delete
 	find . -type d -name ".eggs" -exec rm -rf {} +
 	find . -type f -name "*.egg" -delete
-	@echo "✨ Clean complete!"
+	@echo "Clean complete"
 
 # Deep clean - removes everything including virtual environment
 deep-clean: clean
-	@echo "🧹 Deep cleaning - removing all generated files..."
+	@echo "Deep cleaning - removing all generated files..."
 	rm -rf .venv/
-	rm -rf Pipfile.lock
-	@echo "⚠️  Virtual environment removed. Run 'make install' to recreate it."
-	@echo "✨ Deep clean complete!"
+	rm -rf uv.lock
+	@echo "WARNING: Virtual environment and lock file removed. Run 'make install' to recreate them."
+	@echo "Deep clean complete"

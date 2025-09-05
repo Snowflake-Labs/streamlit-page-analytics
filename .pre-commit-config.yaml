@@ -22,21 +22,26 @@ repos:
     -   id: check-added-large-files
     -   id: check-toml
 
--   repo: https://github.com/psf/black
-    rev: 24.2.0
+-   repo: local
     hooks:
     -   id: black
+        name: Run black
+        entry: uv run black
+        language: system
 
--   repo: https://github.com/pycqa/isort
-    rev: 5.13.2
+-   repo: local
     hooks:
     -   id: isort
-        name: isort (python)
+        name: Run isort
+        entry: uv run isort
+        language: system
 
--   repo: https://github.com/pre-commit/mirrors-pytest
-    rev: v8.0.0
+-   repo: local
     hooks:
     -   id: pytest
+        name: Run pytest
+        entry: uv run pytest
+        language: system
         pass_filenames: false
         always_run: true
 - repo: https://github.com/google/addlicense

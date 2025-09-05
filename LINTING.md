@@ -1,8 +1,8 @@
-# 🚀 Comprehensive Code Quality Setup
+# Comprehensive Code Quality Setup
 
 This project includes a comprehensive local linting setup with multiple tools working together to ensure high code quality. All linters are configured to work together harmoniously.
 
-## 🛠️ Included Linters
+## Included Linters
 
 | Tool | Purpose | Config |
 |------|---------|--------|
@@ -15,7 +15,7 @@ This project includes a comprehensive local linting setup with multiple tools wo
 | **pydocstyle** | Docstring style | `pyproject.toml` |
 | **vulture** | Dead code detection | `pyproject.toml` |
 
-## 🚀 Quick Start
+## Quick Start
 
 ```bash
 # Run all linters
@@ -31,42 +31,27 @@ make lint ARGS='--only black isort'
 make lint ARGS='--skip pylint mypy'
 ```
 
-## 📝 Sample Output
+## Sample Output
 
 ```
 =============================================================
-🚀 CODE QUALITY CHECK
+CODE QUALITY CHECK
 =============================================================
 
 Source directory: streamlit_page_analytics
 Python version: 3.10.0
 
-🔍 Running black
-✅ black passed
-
-🔍 Running isort
-✅ isort passed
-
-🔍 Running flake8
-✅ flake8 passed
-
-🔍 Running pylint
-✅ pylint passed
-
-🔍 Running mypy
-✅ mypy passed
-
-🔍 Running bandit
-✅ bandit passed
-
-🔍 Running pydocstyle
-✅ pydocstyle passed
-
-🔍 Running vulture
-✅ vulture passed
+Running black: PASS
+Running isort: PASS
+Running flake8: PASS
+Running pylint: PASS
+Running mypy: PASS
+Running bandit: PASS
+Running pydocstyle: PASS
+Running vulture: PASS
 
 =============================================================
-📊 LINTING SUMMARY
+LINTING SUMMARY
 =============================================================
 
   black        PASS
@@ -79,13 +64,13 @@ Python version: 3.10.0
   vulture      PASS
 
 Results:
-  ✅ Passed: 8
-  ❌ Failed: 0
+  Passed: 8
+  Failed: 0
 
-🎉 All linters passed! Code quality is excellent!
+All linters passed! Code quality is excellent!
 ```
 
-## 🔧 Configuration
+## Configuration
 
 Each linter is configured in either `pyproject.toml` or `setup.cfg`:
 
@@ -151,11 +136,11 @@ make install-hooks
 make test-hooks
 ```
 
-## 💡 Tips
+## Tips
 
 1. Run `make lint-fix` first to auto-fix formatting issues
 2. Use `make lint ARGS='--only <tool>'` to run specific linters
 3. Configure your editor to run black/isort on save
 4. Review the configuration in `pyproject.toml` for customization
 
-This setup provides comprehensive code quality checks while maintaining flexibility and ease of use! 🎉
+This setup provides comprehensive code quality checks while maintaining flexibility and ease of use!

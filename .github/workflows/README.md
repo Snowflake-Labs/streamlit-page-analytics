@@ -74,5 +74,5 @@ pip install streamlit_page_analytics-1.0.0.tar.gz
 ## Requirements
 
 - Python 3.10+
-- pipenv for dependency management
+- uv for dependency management
 - setuptools and build tools
