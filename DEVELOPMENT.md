@@ -6,13 +6,13 @@ Complete guide for maintaining code quality with automated checks at every stage
 
 ```bash
 # 1. Install all dependencies
-make install
+task install
 
 # 2. Install Git hooks for automatic quality checks
-make install-hooks
+task install-hooks
 
 # 3. Test your setup
-make test-hooks
+task test-hooks
 ```
 
 ## 🔄 Development Workflow
@@ -22,25 +22,25 @@ make test-hooks
 #### Before You Start Coding
 ```bash
 # Ensure dependencies are up-to-date
-make install
+task install
 ```
 
 #### While Coding
 ```bash
 # Quick feedback loop during development
-make lint-quick
+task lint-quick
 
 # Auto-fix formatting issues
-make lint-fix
+task lint-fix
 ```
 
 #### Before Committing
 ```bash
 # Full code quality check
-make lint
+task lint
 
 # If issues found, auto-fix what's possible
-make lint-fix
+task lint-fix
 
 # Commit (pre-commit hook will run automatically)
 git add .
@@ -67,7 +67,7 @@ Commit proceeding...
 **If it fails:**
 - Commit is blocked
 - Shows how to fix issues
-- Run `make lint-fix` to auto-fix
+- Run `task lint-fix` to auto-fix
 
 #### 2. GitHub Workflow
 **Runs on push and pull requests**
@@ -100,26 +100,26 @@ Commit proceeding...
 ### Linting Commands
 ```bash
 # Run all linters (comprehensive)
-make lint
+task lint
 
 # Auto-fix formatting issues
-make lint-fix
+task lint-fix
 
 # Quick checks (development)
-make lint-quick
+task lint-quick
 
 # Custom linter selection
-make lint ARGS='--only black flake8'
-make lint ARGS='--skip pylint mypy'
+task lint -- --only black flake8
+task lint -- --skip pylint mypy
 ```
 
 ### Git Hook Commands
 ```bash
 # Install pre-commit hooks
-make install-hooks
+task install-hooks
 
 # Test the hooks work
-make test-hooks
+task test-hooks
 
 # Bypass hooks (not recommended)
 git commit --no-verify
@@ -128,19 +128,19 @@ git commit --no-verify
 ### Development Commands
 ```bash
 # Install/update dependencies
-make install
+task install
 
 # Run tests
-make test
+task test
 
 # Run tests with coverage report
-make test-cov
+task test-cov
 
 # Clean build artifacts
-make clean
+task clean
 
 # Show all commands
-make help
+task help
 ```
 
 ## Troubleshooting
@@ -150,16 +150,16 @@ make help
 **Problem: Hook not running**
 ```bash
 # Reinstall hooks
-make install-hooks
+task install-hooks
 ```
 
 **Problem: Hook fails**
 ```bash
 # Auto-fix issues
-make lint-fix
+task lint-fix
 
 # Check what's failing
-make lint-quick
+task lint-quick
 
 # Skip hook (emergency only)
 git commit --no-verify
@@ -198,9 +198,9 @@ git commit --no-verify
 ## Best Practices
 
 ### Daily Development
-1. **Start with clean state**: `make install`
-2. **Code with quick feedback**: `make lint-quick`
-3. **Fix before committing**: `make lint-fix`
+1. **Start with clean state**: `task install`
+2. **Code with quick feedback**: `task lint-quick`
+3. **Fix before committing**: `task lint-fix`
 4. **Let hooks guide you**: Don't bypass unless emergency
 
 ### Code Reviews
@@ -223,7 +223,7 @@ git commit --no-verify
 git commit --no-verify -m "Emergency fix: description"
 
 # Follow up immediately
-make lint-fix
+task lint-fix
 git add .
 git commit -m "Fix linting issues from emergency commit"
 ```
@@ -231,7 +231,7 @@ git commit -m "Fix linting issues from emergency commit"
 ### Disable Specific Linters
 ```bash
 # Temporarily skip problematic linters
-make lint ARGS='--skip pylint vulture'
+task lint -- --skip pylint vulture
 
 # For specific issues, use inline comments
 # pylint: disable=line-too-long
@@ -249,16 +249,16 @@ make lint ARGS='--skip pylint vulture'
 ### Local Metrics
 ```bash
 # Full quality report
-make lint
+task lint
 
 # Security-focused check
-make lint ARGS='--only bandit'
+task lint -- --only bandit
 
 # Type coverage check
-make lint ARGS='--only mypy'
+task lint -- --only mypy
 
 # Code coverage report
-make test-cov
+task test-cov
 ```
 
 ## Success Indicators
@@ -274,7 +274,7 @@ make test-cov
 
 - **[LINTING.md](./LINTING.md)** - Detailed linter configuration
 - **[.github/workflows/lint.yml](./.github/workflows/lint.yml)** - GitHub workflow
-- **[Makefile](./Makefile)** - Available commands
+- **[Taskfile](./Taskfile.yaml)** - Available commands
 - **[pyproject.toml](./pyproject.toml)** - Tool configurations
 
 ---

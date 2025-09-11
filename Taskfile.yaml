@@ -1,0 +1,227 @@
+version: '3'
+
+vars:
+  SOURCE_DIR: streamlit_page_analytics
+  TESTS_DIR: tests
+  LINT_SCRIPT: ./scripts/lint.sh
+
+tasks:
+  help:
+    desc: Show help information
+    cmds:
+      - |
+        echo "Streamlit Page Analytics Development Commands"
+        echo ""
+        echo "SETUP & DEPENDENCIES:"
+        echo "  install      - Install dependencies (matches CI environment)"
+        echo "  install-hooks- Install Git pre-commit hooks"
+        echo ""
+        echo "CODE QUALITY:"
+        echo "  lint         - Run comprehensive linting (matches CI)"
+        echo "  lint-fix     - Run linters with auto-fix enabled"
+        echo "  lint-quick   - Run only fast linters for quick feedback"
+        echo "  license      - Add/update license headers"
+        echo ""
+        echo "TESTING:"
+        echo "  test         - Run tests (matches CI environment)"
+        echo "  test-cov     - Run tests with coverage report"
+        echo "  test-hooks   - Test the pre-commit hook"
+        echo ""
+        echo "MAINTENANCE:"
+        echo "  clean        - Remove build artifacts and caches"
+        echo "  deep-clean   - Remove all generated files including virtual env"
+        echo ""
+        echo "BUILD & DISTRIBUTION:"
+        echo "  build-wheel  - Build wheel distribution"
+        echo "  build-tar    - Build tar.gz source distribution"
+        echo "  build-zip    - Build zip source distribution"
+        echo "  build-all    - Build all distribution formats"
+        echo ""
+        echo "EXAMPLES:"
+        echo "  task lint                          # Full linting suite"
+        echo "  task lint -- --only black flake8  # Run specific linters"
+        echo "  task lint-fix                     # Auto-fix code issues"
+        echo "  task test-cov                     # Tests with coverage"
+        echo "  task build-all                    # Build all formats"
+    silent: true
+
+  default:
+    desc: Show help information
+    cmds:
+      - task: help
+
+  # Internal lint tasks for individual directories
+  lint-source:
+    internal: true
+    desc: Lint source directory
+    cmds:
+      - task: clean
+      - "{{.LINT_SCRIPT}} --source {{.SOURCE_DIR}} {{.CLI_ARGS}}"
+
+  lint-tests:
+    internal: true
+    desc: Lint tests directory  
+    cmds:
+      - "{{.LINT_SCRIPT}} --source {{.TESTS_DIR}} {{.CLI_ARGS}}"
+
+  lint-source-fix:
+    internal: true
+    desc: Lint source directory with auto-fix
+    cmds:
+      - "{{.LINT_SCRIPT}} --source {{.SOURCE_DIR}} --fix || true"
+
+  lint-tests-fix:
+    internal: true
+    desc: Lint tests directory with auto-fix
+    cmds:
+      - "{{.LINT_SCRIPT}} --source {{.TESTS_DIR}} --fix || true"
+
+  lint-source-quick:
+    internal: true
+    desc: Quick lint source directory
+    cmds:
+      - "{{.LINT_SCRIPT}} --source {{.SOURCE_DIR}} --only black flake8 isort"
+
+  lint-tests-quick:
+    internal: true
+    desc: Quick lint tests directory
+    cmds:
+      - "{{.LINT_SCRIPT}} --source {{.TESTS_DIR}} --only black flake8 isort"
+
+  # Public lint tasks
+  lint:
+    desc: Run comprehensive linting (matches CI)
+    deps:
+      - task: lint-source
+      - task: lint-tests
+    cmds:
+      - echo "Linting completed successfully!"
+
+  lint-fix:
+    desc: Run linters with auto-fix
+    deps:
+      - task: lint-source-fix
+      - task: lint-tests-fix
+    cmds:
+      - echo "Auto-fix completed. Please review any remaining issues manually."
+
+  lint-quick:
+    desc: Run only fast linters for quick feedback
+    deps:
+      - task: lint-source-quick
+      - task: lint-tests-quick
+    cmds:
+      - echo "Quick linting completed!"
+
+  license:
+    desc: Add/update license headers
+    cmds:
+      - echo "Adding/updating license headers..."
+      - ./scripts/add_license.sh
+
+  install:
+    desc: Install dependencies (matches CI environment)
+    cmds:
+      - echo "Installing dependencies..."
+      - uv sync --extra dev
+
+  install-hooks:
+    desc: Install Git hooks
+    cmds:
+      - echo "Installing Git hooks..."
+      - ./scripts/install-hooks.sh
+
+  test:
+    desc: Run tests (matches CI environment)
+    cmds:
+      - echo "Running tests..."
+      - uv run pytest {{.TESTS_DIR}}/ -v
+
+  test-cov:
+    desc: Run tests with coverage
+    cmds:
+      - |
+        echo "Running tests with coverage..."
+        uv run pytest {{.TESTS_DIR}}/ -v \
+          --cov={{.SOURCE_DIR}} \
+          --cov-report=term-missing \
+          --cov-report=html \
+          --cov-report=xml
+        echo "Coverage reports: htmlcov/index.html, coverage.xml"
+
+  test-hooks:
+    desc: Test pre-commit hook
+    cmds:
+      - |
+        echo "Testing pre-commit hook..."
+        if [ -f .git/hooks/pre-commit ]; then
+          echo "Running pre-commit hook test..."
+          ./.git/hooks/pre-commit
+        else
+          echo "ERROR: Pre-commit hook not found. Run 'task install-hooks' first."
+          exit 1
+        fi
+
+  build-wheel:
+    desc: Build wheel distribution
+    deps: [clean]
+    cmds:
+      - echo "Building wheel distribution..."
+      - uv run python -m build --wheel
+
+  build-zip:
+    desc: Build zip source distribution
+    deps: [clean]
+    cmds:
+      - echo "Building zip source distribution..."
+      - ./scripts/make_zip_dist.sh
+
+  build-tar:
+    desc: Build tar.gz source distribution
+    deps: [clean]
+    cmds:
+      - echo "Building tar.gz source distribution..."
+      - uv run python -m build --sdist
+
+  build-all:
+    desc: Build all distributions
+    deps: [clean]
+    cmds:
+      - echo "Building all distributions..."
+      - uv run python -m build --wheel
+      - uv run python -m build --sdist
+      - ./scripts/make_zip_dist.sh
+
+  clean:
+    desc: Remove build artifacts and caches
+    cmds:
+      - echo "Cleaning build artifacts and caches..."
+      - rm . -type f -name "_version.py" -delete || true
+      - rm -rf build/
+      - rm -rf dist/
+      - rm -rf *.egg-info/
+      - rm -rf .pytest_cache/
+      - rm -rf .mypy_cache/
+      - rm -rf .coverage
+      - rm -rf htmlcov/
+      - rm -rf .tox/
+      - find . -type d -name __pycache__ -exec rm -rf {} + || true
+      - find . -type f -name "*.pyc" -delete || true
+      - find . -type f -name "*.pyo" -delete || true
+      - find . -type f -name "*.pyd" -delete || true
+      - find . -type f -name ".coverage" -delete || true
+      - find . -type f -name "coverage.xml" -delete || true
+      - find . -type d -name ".eggs" -exec rm -rf {} + || true
+      - find . -type f -name "*.egg" -delete || true
+      - echo "Clean complete"
+
+  deep-clean:
+    desc: Remove all generated files including virtual environment
+    deps: [clean]
+    cmds:
+      - |
+        echo "Deep cleaning - removing all generated files..."
+        rm -rf .venv/
+        rm -rf uv.lock
+        echo "WARNING: Virtual env and lock file removed. Run 'task install' to recreate."
+        echo "Deep clean complete"

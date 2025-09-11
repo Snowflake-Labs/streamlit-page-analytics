@@ -19,16 +19,16 @@ This project includes a comprehensive local linting setup with multiple tools wo
 
 ```bash
 # Run all linters
-make lint
+task lint
 
 # Run with auto-fix (where supported)
-make lint-fix
+task lint-fix
 
 # Run specific linters
-make lint ARGS='--only black isort'
+task lint -- --only black isort
 
 # Skip specific linters
-make lint ARGS='--skip pylint mypy'
+task lint -- --skip pylint mypy
 ```
 
 ## Sample Output
@@ -130,16 +130,16 @@ The linting setup is integrated with Git pre-commit hooks:
 
 ```bash
 # Install hooks
-make install-hooks
+task install-hooks
 
 # Test hooks
-make test-hooks
+task test-hooks
 ```
 
 ## Tips
 
-1. Run `make lint-fix` first to auto-fix formatting issues
-2. Use `make lint ARGS='--only <tool>'` to run specific linters
+1. Run `task lint-fix` first to auto-fix formatting issues
+2. Use `task lint -- --only <tool>` to run specific linters
 3. Configure your editor to run black/isort on save
 4. Review the configuration in `pyproject.toml` for customization
 

@@ -40,6 +40,11 @@ jobs:
       with:
         version: "latest"
 
+    - name: Install Task
+      uses: arduino/setup-task@v2
+      with:
+        version: 3.x
+
     # Enhanced caching strategy for uv
     - name: Cache uv
       uses: actions/cache@v4
@@ -61,10 +66,10 @@ jobs:
           ${{ runner.os }}-tools-
 
     - name: Install dependencies
-      run: make install
+      run: task install
 
     - name: Run tests with coverage
-      run: make test-cov
+      run: task test-cov
 
     - name: Upload coverage reports
       uses: codecov/codecov-action@v5
@@ -74,7 +79,7 @@ jobs:
         fail_ci_if_error: false
 
     - name: Run linting suite
-      run: make lint
+      run: task lint
       continue-on-error: true
       id: lint_check
 
@@ -94,6 +99,11 @@ jobs:
       uses: astral-sh/setup-uv@v6
       with:
         version: "latest"
+
+    - name: Install Task
+      uses: arduino/setup-task@v2
+      with:
+        version: 3.x
 
     # Reuse uv cache from test job
     - name: Cache uv
@@ -116,10 +126,10 @@ jobs:
           ${{ runner.os }}-build-
 
     - name: Install dependencies
-      run: make install
+      run: task install
 
     - name: Build all distributions
-      run: make build-all
+      run: task build-all
 
     - name: Verify distributions
       run: |
