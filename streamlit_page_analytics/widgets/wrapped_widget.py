@@ -31,6 +31,7 @@ class WrappedWidget:
     _logger: logging.Logger
     _event_logger_fn: Callable[[UserEvent], None]
     _session_state_fn: Callable[[], dict[str, Any]]
+    _mask_text_input_values: bool
 
     def __init__(
         self,
@@ -38,6 +39,8 @@ class WrappedWidget:
         widget_fn: Callable,
         event_logger_fn: Callable[[UserEvent], None],
         session_state_fn: Callable[[], dict[str, Any]],
+        *,
+        mask_text_input_values: bool = False,
     ) -> None:
         """Initialize the WrappedWidget."""
         self._widget_mapping = widget_mapping
@@ -45,6 +48,7 @@ class WrappedWidget:
         self._logger = logging.getLogger(__name__)
         self._event_logger_fn = event_logger_fn
         self._session_state_fn = session_state_fn
+        self._mask_text_input_values = mask_text_input_values
 
     def wrapped_widget_fn(self, *args: List[Any], **kwargs: Dict[str, Any]) -> Any:
         """Wrapper function that adds analytics to widget interactions.
@@ -91,6 +95,7 @@ class WrappedWidget:
                 original_element_callback=extracted_widget.original_action_callback_fn,
                 logger_fn=self._event_logger_fn,
                 session_state_fn=self._session_state_fn,
+                mask_text_input_values=self._mask_text_input_values,
             )
             kwargs_to_use[extraction_attributes["action"].name] = (
                 user_event_logger.logging_callback_fn

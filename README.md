@@ -59,6 +59,25 @@ st.button('my awesome button')
 page_analytics.stop_tracking()
 ```
 
+### Masking Text Input Values
+
+For privacy-sensitive applications, you can mask the values of `text_input` and `text_area` widgets in the logs by setting `mask_text_input_values=True`. When enabled, the actual input values will be replaced with `"[REDACTED]"` in the log output.
+
+```python
+import streamlit as st
+from streamlit_page_analytics import StreamlitPageAnalytics
+
+with StreamlitPageAnalytics.track(
+    name="my-app",
+    session_id=f"{session_id}",
+    user_id=f"{user_id}",
+    mask_text_input_values=True,  # Enable masking for text inputs
+):
+    st.text_input("Password")  # Value will be logged as "[REDACTED]"
+    st.text_area("Notes")      # Value will be logged as "[REDACTED]"
+    st.selectbox("Option", ["A", "B"])  # Not affected, logs actual value
+```
+
 ## Current Status
 
 The following Streamlit widgets are currently supported:
