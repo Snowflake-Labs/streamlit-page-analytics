@@ -27,6 +27,16 @@ from streamlit.testing.v1 import AppTest
 from streamlit_page_analytics import StreamlitPageAnalytics
 
 
+def _filter_widget_logs(log_lines: list[str]) -> list[dict]:
+    """Filter log lines to only include widget interaction logs (not start_tracking)."""
+    result = []
+    for line in log_lines:
+        log_json = json.loads(line)
+        if log_json.get("action") != "start_tracking":
+            result.append(log_json)
+    return result
+
+
 # pylint: disable=no-member
 def test_text_input_masked_when_enabled() -> None:
     """Test that text input values are masked when mask_text_input_values=True."""
@@ -56,9 +66,10 @@ def test_text_input_masked_when_enabled() -> None:
         at.run()
 
     log_lines = log_stream.getvalue().splitlines()
-    assert len(log_lines) == 1, f"Expected 1 log line, got {len(log_lines)}"
+    widget_logs = _filter_widget_logs(log_lines)
+    assert len(widget_logs) == 1, f"Expected 1 widget log, got {len(widget_logs)}"
 
-    log_json = json.loads(log_lines[0])
+    log_json = widget_logs[0]
 
     # Verify the value is redacted, not the actual input
     assert log_json["widget"]["values"]["current"] == "[REDACTED]"
@@ -93,9 +104,10 @@ def test_text_area_masked_when_enabled() -> None:
         at.run()
 
     log_lines = log_stream.getvalue().splitlines()
-    assert len(log_lines) == 1, f"Expected 1 log line, got {len(log_lines)}"
+    widget_logs = _filter_widget_logs(log_lines)
+    assert len(widget_logs) == 1, f"Expected 1 widget log, got {len(widget_logs)}"
 
-    log_json = json.loads(log_lines[0])
+    log_json = widget_logs[0]
 
     # Verify the value is redacted, not the actual input
     assert log_json["widget"]["values"]["current"] == "[REDACTED]"
@@ -130,9 +142,10 @@ def test_text_input_not_masked_when_disabled() -> None:
         at.run()
 
     log_lines = log_stream.getvalue().splitlines()
-    assert len(log_lines) == 1, f"Expected 1 log line, got {len(log_lines)}"
+    widget_logs = _filter_widget_logs(log_lines)
+    assert len(widget_logs) == 1, f"Expected 1 widget log, got {len(widget_logs)}"
 
-    log_json = json.loads(log_lines[0])
+    log_json = widget_logs[0]
 
     # Verify the actual value is logged
     assert log_json["widget"]["values"]["current"] == "visible text value"
@@ -166,9 +179,10 @@ def test_other_widgets_not_affected_by_masking() -> None:
         at.run()
 
     log_lines = log_stream.getvalue().splitlines()
-    assert len(log_lines) == 1, f"Expected 1 log line, got {len(log_lines)}"
+    widget_logs = _filter_widget_logs(log_lines)
+    assert len(widget_logs) == 1, f"Expected 1 widget log, got {len(widget_logs)}"
 
-    log_json = json.loads(log_lines[0])
+    log_json = widget_logs[0]
 
     # Verify selectbox value is NOT masked
     assert log_json["widget"]["values"]["current"] == "Option B"

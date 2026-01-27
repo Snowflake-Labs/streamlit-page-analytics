@@ -26,7 +26,7 @@ from typing import Any, Callable, Dict, Optional
 import streamlit as st
 
 from .config import MAPPINGS
-from .models import UserEvent, WidgetMappingKey
+from .models import UserEvent, UserEventAction, WidgetMappingKey
 from .utils import clean_values
 from .widgets import WrappedWidget
 
@@ -106,6 +106,7 @@ class StreamlitPageAnalytics:
                 replaced with "[REDACTED]" in the logs. Defaults to False.
         """
         self._original_mappings = {}
+        self._name = name
         self._session_id = session_id
         self._user_id = user_id
         self._log_level = log_level
@@ -210,18 +211,44 @@ class StreamlitPageAnalytics:
             ),
         )
 
-    def start_tracking(self) -> None:
+    def start_tracking(self, page_name: Optional[str] = None) -> None:
         """Start tracking user interactions with Streamlit elements.
 
         This method wraps all configured Streamlit functions with analytics
         tracking functionality. After calling this method, interactions with
         supported Streamlit elements will automatically generate log events.
 
+        If a non-empty page_name is provided, a START_TRACKING event will be
+        logged only when the page changes (i.e., when the current page_name
+        differs from the previously tracked page). If page_name is None or
+        empty, no START_TRACKING event is logged.
+
+        Args:
+            page_name: Optional name of the current page. When provided and
+                non-empty, tracking events are logged when navigating to a
+                different page. If None or empty, no page tracking event is logged.
+
         Note:
             This method should be called before creating any Streamlit elements
             that you want to track.
         """
         self._wrap_st_functions()
+
+        # Only log if page_name is provided and non-empty
+        if not page_name:
+            return
+
+        # Page-based tracking: log only when page changes
+        last_page_key = f"streamlit_page_analytics_{self._name}_last_page"
+        last_page = st.session_state.get(last_page_key)
+
+        if last_page != page_name:
+            st.session_state[last_page_key] = page_name
+            start_tracking_event = UserEvent(
+                action=UserEventAction.START_TRACKING,
+                extra={"page_name": page_name},
+            )
+            self.log_event(start_tracking_event)
 
     def stop_tracking(self) -> None:
         """Stop tracking user interactions and restore original Streamlit functions.

@@ -29,7 +29,7 @@ def _assert_equals(
     expected: Any, actual: Any, field_name: Optional[str] = None
 ) -> None:
     """Assert that two values are equal or raise an AssertionError."""
-    error_msg = f"""Mismatch {field_name + '|'  if field_name else ''}
+    error_msg = f"""Mismatch {field_name + '|' if field_name else ''}
     Expected: {expected}, Actual: {actual}
     """
     assert expected == actual, error_msg

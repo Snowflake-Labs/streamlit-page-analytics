@@ -33,7 +33,7 @@ Example:
 from .streamlit_page_analytics import StreamlitPageAnalytics
 
 try:
-    from ._version import __version__  # type: ignore[import-not-found]
+    from ._version import __version__
 except ImportError:
     # Fallback for development installations
     from importlib.metadata import version
