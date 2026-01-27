@@ -47,7 +47,7 @@ jobs:
 
     # Enhanced caching strategy for uv
     - name: Cache uv
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: ~/.cache/uv
         key: ${{ runner.os }}-uv-${{ hashFiles('**/uv.lock') }}
@@ -55,7 +55,7 @@ jobs:
           ${{ runner.os }}-uv-
 
     - name: Cache tool outputs
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: |
           .mypy_cache
@@ -107,7 +107,7 @@ jobs:
 
     # Reuse uv cache from test job
     - name: Cache uv
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: ~/.cache/uv
         key: ${{ runner.os }}-uv-${{ hashFiles('**/uv.lock') }}
@@ -116,7 +116,7 @@ jobs:
 
     # Cache build artifacts and tools
     - name: Cache build artifacts
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: |
           build/
@@ -161,7 +161,7 @@ jobs:
         fi
 
     - name: Upload build artifacts
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       with:
         name: distributions
         path: dist/
