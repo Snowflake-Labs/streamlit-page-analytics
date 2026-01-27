@@ -59,6 +59,35 @@ st.button('my awesome button')
 page_analytics.stop_tracking()
 ```
 
+### Page Tracking
+
+Track page visits in multi-page Streamlit applications by passing a `page_name` to `start_tracking()`. A `start_tracking` event is logged only when the user navigates to a different page, avoiding duplicate logs on page reruns.
+
+```python
+import streamlit as st
+from streamlit_page_analytics import StreamlitPageAnalytics
+
+page_analytics = StreamlitPageAnalytics(
+    name="my-app", session_id=f"{session_id}", user_id=f"{user_id}"
+)
+
+# Pass the current page name - logs only when page changes
+page_analytics.start_tracking(page_name="Home")
+
+st.title("Home Page")
+st.button("Click me")
+
+page_analytics.stop_tracking()
+```
+
+When the user navigates between pages:
+- `start_tracking(page_name="Home")` - Logs (first visit)
+- `start_tracking(page_name="Home")` - No log (same page, e.g., rerun)
+- `start_tracking(page_name="Settings")` - Logs (different page)
+- `start_tracking(page_name="Home")` - Logs (navigated back)
+
+If `page_name` is not provided or is empty, no page tracking event is logged.
+
 ### Masking Text Input Values
 
 For privacy-sensitive applications, you can mask the values of `text_input` and `text_area` widgets in the logs by setting `mask_text_input_values=True`. When enabled, the actual input values will be replaced with `"[REDACTED]"` in the log output.

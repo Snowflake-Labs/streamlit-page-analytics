@@ -28,6 +28,7 @@ class UserEventAction(Enum):
         OTHER: Any other type of action not covered by the above categories.
     """
 
+    START_TRACKING = "start_tracking"
     CLICK = "click"
     CHANGE = "change"
     SUBMIT = "submit"  # noqa: F841  # vulture: ignore - used in form submissions
