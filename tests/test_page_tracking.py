@@ -89,7 +89,7 @@ class TestPageTracking:
             log_lines = _get_log_lines(log_stream)
             assert len(log_lines) == 1
             assert log_lines[0]["action"] == "start_tracking"
-            assert log_lines[0]["extra"]["page_name"] == "Home"
+            assert log_lines[0]["page_name"] == "Home"
             assert log_lines[0]["session_id"] == _TEST_SESSION_ID
             assert log_lines[0]["user_id"] == _TEST_USER_ID
 
@@ -113,7 +113,7 @@ class TestPageTracking:
 
             log_lines = _get_log_lines(log_stream)
             assert len(log_lines) == 1  # Only one log entry
-            assert log_lines[0]["extra"]["page_name"] == "Home"
+            assert log_lines[0]["page_name"] == "Home"
 
     def test_start_tracking_different_page_logs_again(
         self, mock_session_state: MagicMock
@@ -132,8 +132,8 @@ class TestPageTracking:
 
             log_lines = _get_log_lines(log_stream)
             assert len(log_lines) == 2
-            assert log_lines[0]["extra"]["page_name"] == "Home"
-            assert log_lines[1]["extra"]["page_name"] == "Settings"
+            assert log_lines[0]["page_name"] == "Home"
+            assert log_lines[1]["page_name"] == "Settings"
 
     def test_start_tracking_page_navigation_sequence(
         self, mock_session_state: MagicMock
@@ -154,7 +154,7 @@ class TestPageTracking:
 
             log_lines = _get_log_lines(log_stream)
             assert len(log_lines) == 4
-            assert [line["extra"]["page_name"] for line in log_lines] == [
+            assert [line["page_name"] for line in log_lines] == [
                 "Home",
                 "Settings",
                 "Home",
@@ -205,8 +205,8 @@ class TestPageTracking:
 
             log_lines = _get_log_lines(log_stream)
             assert len(log_lines) == 2
-            assert log_lines[0]["extra"]["page_name"] == "Home"
-            assert log_lines[1]["extra"]["page_name"] == "Settings"
+            assert log_lines[0]["page_name"] == "Home"
+            assert log_lines[1]["page_name"] == "Settings"
 
     def test_separate_analytics_instances_have_independent_tracking(
         self, mock_session_state: MagicMock
@@ -281,7 +281,7 @@ class TestPageTracking:
 
             log_lines = _get_log_lines(log_stream)
             assert len(log_lines) == 3
-            assert [line["extra"]["page_name"] for line in log_lines] == [
+            assert [line["page_name"] for line in log_lines] == [
                 "Home",
                 "home",
                 "HOME",
