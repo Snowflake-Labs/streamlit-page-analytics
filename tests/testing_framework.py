@@ -85,9 +85,9 @@ def run_widget_interaction_test(
     log_lines = log_stream.getvalue().splitlines()
     widget_logs = _filter_widget_logs(log_lines)
 
-    assert len(widget_logs) == len(expected_log_lines), (
-        f"Expected {len(expected_log_lines)} log lines, got {len(widget_logs)}"
-    )
+    assert len(widget_logs) == len(
+        expected_log_lines
+    ), f"Expected {len(expected_log_lines)} log lines, got {len(widget_logs)}"
 
     for log_json, expected_log_line in zip(widget_logs, expected_log_lines):
         _assert_equals(

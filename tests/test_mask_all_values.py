@@ -63,7 +63,9 @@ def test_selectbox_masked_when_mask_all_values_enabled() -> None:
             # pylint: disable=import-outside-toplevel
             import streamlit as st
 
-            st.selectbox("Choose Option", options=["Option A", "Option B"], key="select")
+            st.selectbox(
+                "Choose Option", options=["Option A", "Option B"], key="select"
+            )
 
         at = AppTest.from_function(app)
         at.run()
@@ -95,7 +97,9 @@ def test_slider_masked_when_mask_all_values_enabled() -> None:
             # pylint: disable=import-outside-toplevel
             import streamlit as st
 
-            st.slider("Choose Value", min_value=0, max_value=100, value=50, key="slider")
+            st.slider(
+                "Choose Value", min_value=0, max_value=100, value=50, key="slider"
+            )
 
         at = AppTest.from_function(app)
         at.run()
@@ -127,7 +131,9 @@ def test_widgets_not_masked_when_mask_all_values_disabled() -> None:
             # pylint: disable=import-outside-toplevel
             import streamlit as st
 
-            st.selectbox("Choose Option", options=["Option A", "Option B"], key="select")
+            st.selectbox(
+                "Choose Option", options=["Option A", "Option B"], key="select"
+            )
 
         at = AppTest.from_function(app)
         at.run()
