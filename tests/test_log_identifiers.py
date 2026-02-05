@@ -36,7 +36,7 @@ def test_custom_session_id_in_logs() -> None:
         at.run()
 
         button = at.button[0]
-        button.click()
+        button.click()  # pylint: disable=no-member
         at.run()
 
     expected_log = [
@@ -71,7 +71,7 @@ def test_custom_user_id_in_logs() -> None:
         at.run()
 
         checkbox = at.checkbox[0]
-        checkbox.check()
+        checkbox.check()  # pylint: disable=no-member
         at.run()
 
     expected_log = [
@@ -107,7 +107,7 @@ def test_custom_session_id_and_user_id_in_logs() -> None:
         at.run()
 
         slider = at.slider[0]
-        slider.set_value(50)
+        slider.set_value(50)  # pylint: disable=no-member
         at.run()
 
     expected_log = [
@@ -131,7 +131,7 @@ def test_custom_session_id_and_user_id_in_logs() -> None:
 
 
 def test_multiple_interactions_have_consistent_ids() -> None:
-    """Test that session_id and user_id remain consistent across multiple interactions."""
+    """Test that IDs remain consistent across multiple interactions."""
 
     def widget_interaction() -> None:
         def app() -> None:
@@ -144,10 +144,10 @@ def test_multiple_interactions_have_consistent_ids() -> None:
         at = AppTest.from_function(app)
         at.run()
 
-        at.button[0].click()
+        at.button[0].click()  # pylint: disable=no-member
         at.run()
 
-        at.button[1].click()
+        at.button[1].click()  # pylint: disable=no-member
         at.run()
 
     expected_log = [
@@ -191,7 +191,7 @@ def test_special_characters_in_session_id() -> None:
         at.run()
 
         button = at.button[0]
-        button.click()
+        button.click()  # pylint: disable=no-member
         at.run()
 
     expected_log = [
@@ -226,7 +226,7 @@ def test_special_characters_in_user_id() -> None:
         at.run()
 
         button = at.button[0]
-        button.click()
+        button.click()  # pylint: disable=no-member
         at.run()
 
     expected_log = [

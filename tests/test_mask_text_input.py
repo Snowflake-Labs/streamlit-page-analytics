@@ -133,7 +133,9 @@ def test_other_widgets_not_affected_by_masking() -> None:
             # pylint: disable=import-outside-toplevel
             import streamlit as st
 
-            st.selectbox("Choose Option", options=["Option A", "Option B"], key="select")
+            st.selectbox(
+                "Choose Option", options=["Option A", "Option B"], key="select"
+            )
 
         at = AppTest.from_function(app)
         at.run()
