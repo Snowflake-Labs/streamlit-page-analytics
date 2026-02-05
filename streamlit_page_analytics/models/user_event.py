@@ -30,6 +30,7 @@ class UserEvent:
         session_id: Unique identifier for the user session. Can be None if not set.
         user_id: Details about the user who performed the action. Can be None if
             not available.
+        page_name: Name of the page where the event occurred. Can be None if not set.
         action: The type of action performed, either as a string or
             UserEventAction enum. Defaults to UserEventAction.OTHER.
         widget: Details about the UI element that was interacted with. Can be
@@ -40,6 +41,7 @@ class UserEvent:
 
     session_id: Optional[str] = None
     user_id: Optional[str] = None
+    page_name: Optional[str] = None
     action: Union[str, UserEventAction] = UserEventAction.OTHER
     widget: Optional[Widget] = None
     extra: Optional[Dict[str, Any]] = None
@@ -84,6 +86,20 @@ class UserEvent:
         new.user_id = user_id
         return new
 
+    def with_page_name(self, page_name: Optional[str]) -> "UserEvent":
+        """Create a new UserEvent instance with the specified page name.
+
+        Args:
+            page_name: The name of the page where the event occurred.
+
+        Returns:
+            A new UserEvent instance identical to this one but with the
+            specified page_name value.
+        """
+        new = UserEvent(**self.__dict__)
+        new.page_name = page_name
+        return new
+
     def to_dict(self) -> Dict[str, Any]:
         """Convert the UserEvent instance to a dictionary representation.
 
@@ -98,6 +114,7 @@ class UserEvent:
         return {
             "session_id": self.session_id,
             "user_id": self.user_id,
+            "page_name": self.page_name,
             "action": (
                 self.action.value
                 if isinstance(self.action, UserEventAction)

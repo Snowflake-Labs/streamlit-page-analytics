@@ -77,6 +77,7 @@ class StreamlitPageAnalytics:
     _name: str
     _session_id: str
     _user_id: str
+    _page_name: Optional[str]
     _log_level: int
     _mask_text_input_values: bool
     _mask_all_values: bool
@@ -113,6 +114,7 @@ class StreamlitPageAnalytics:
         self._name = name
         self._session_id = session_id
         self._user_id = user_id
+        self._page_name = None
         self._log_level = log_level
         self._logger = logger if logger else logging.getLogger(name)
         self._logger.setLevel(log_level)
@@ -207,8 +209,10 @@ class StreamlitPageAnalytics:
         if not isinstance(partial_event, UserEvent):
             raise TypeError(f"Expected UserEvent, got: {type(partial_event)}")
 
-        cleaned_event = partial_event.with_session_id(self._session_id).with_user_id(
-            self._user_id
+        cleaned_event = (
+            partial_event.with_session_id(self._session_id)
+            .with_user_id(self._user_id)
+            .with_page_name(self._page_name)
         )
 
         self._logger.log(
@@ -247,6 +251,9 @@ class StreamlitPageAnalytics:
         if not page_name:
             return
 
+        # Update the current page name for all subsequent events
+        self._page_name = page_name
+
         # Page-based tracking: log only when page changes
         last_page_key = f"streamlit_page_analytics_{self._name}_last_page"
         last_page = st.session_state.get(last_page_key)
@@ -255,7 +262,6 @@ class StreamlitPageAnalytics:
             st.session_state[last_page_key] = page_name
             start_tracking_event = UserEvent(
                 action=UserEventAction.START_TRACKING,
-                extra={"page_name": page_name},
             )
             self.log_event(start_tracking_event)
 
