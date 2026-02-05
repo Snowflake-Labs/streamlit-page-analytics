@@ -18,46 +18,21 @@ This module contains tests that verify text input and text area values
 are properly masked when mask_text_input_values=True is set.
 """
 
-import io
-import json
-import logging
-
 from streamlit.testing.v1 import AppTest
-
-from streamlit_page_analytics import StreamlitPageAnalytics
-
-
-def _filter_widget_logs(log_lines: list[str]) -> list[dict]:
-    """Filter log lines to only include widget interaction logs (not start_tracking)."""
-    result = []
-    for line in log_lines:
-        log_json = json.loads(line)
-        if log_json.get("action") != "start_tracking":
-            result.append(log_json)
-    return result
+from testing_framework import run_widget_interaction_test
 
 
 # pylint: disable=no-member
 def test_text_input_masked_when_enabled() -> None:
     """Test that text input values are masked when mask_text_input_values=True."""
 
-    def app() -> None:
-        # pylint: disable=import-outside-toplevel
-        import streamlit as st
+    def widget_interaction() -> None:
+        def app() -> None:
+            # pylint: disable=import-outside-toplevel
+            import streamlit as st
 
-        st.text_input("Sensitive Input", key="sensitive_text")
+            st.text_input("Sensitive Input", key="sensitive_text")
 
-    log_stream = io.StringIO()
-    logger = logging.getLogger("test-mask-text-input")
-    logger.addHandler(logging.StreamHandler(log_stream))
-
-    with StreamlitPageAnalytics.track(
-        name="test-app",
-        session_id="test-session",
-        user_id="test-user",
-        logger=logger,
-        mask_text_input_values=True,
-    ):
         at = AppTest.from_function(app)
         at.run()
 
@@ -65,37 +40,33 @@ def test_text_input_masked_when_enabled() -> None:
         text_input.set_value("my secret password")
         at.run()
 
-    log_lines = log_stream.getvalue().splitlines()
-    widget_logs = _filter_widget_logs(log_lines)
-    assert len(widget_logs) == 1, f"Expected 1 widget log, got {len(widget_logs)}"
+    expected_log = [
+        {
+            "action": "change",
+            "widget": {
+                "id": "sensitive_text",
+                "type": "text_input",
+                "label": "Sensitive Input",
+                "values": {"current": "[REDACTED]"},
+            },
+        }
+    ]
 
-    log_json = widget_logs[0]
-
-    # Verify the value is redacted, not the actual input
-    assert log_json["widget"]["values"]["current"] == "[REDACTED]"
-    assert "my secret password" not in log_stream.getvalue()
+    run_widget_interaction_test(
+        widget_interaction, expected_log, mask_text_input_values=True
+    )
 
 
 def test_text_area_masked_when_enabled() -> None:
     """Test that text area values are masked when mask_text_input_values=True."""
 
-    def app() -> None:
-        # pylint: disable=import-outside-toplevel
-        import streamlit as st
+    def widget_interaction() -> None:
+        def app() -> None:
+            # pylint: disable=import-outside-toplevel
+            import streamlit as st
 
-        st.text_area("Sensitive Text Area", key="sensitive_area")
+            st.text_area("Sensitive Text Area", key="sensitive_area")
 
-    log_stream = io.StringIO()
-    logger = logging.getLogger("test-mask-text-area")
-    logger.addHandler(logging.StreamHandler(log_stream))
-
-    with StreamlitPageAnalytics.track(
-        name="test-app",
-        session_id="test-session",
-        user_id="test-user",
-        logger=logger,
-        mask_text_input_values=True,
-    ):
         at = AppTest.from_function(app)
         at.run()
 
@@ -103,37 +74,33 @@ def test_text_area_masked_when_enabled() -> None:
         text_area.set_value("confidential information\nwith multiple lines")
         at.run()
 
-    log_lines = log_stream.getvalue().splitlines()
-    widget_logs = _filter_widget_logs(log_lines)
-    assert len(widget_logs) == 1, f"Expected 1 widget log, got {len(widget_logs)}"
+    expected_log = [
+        {
+            "action": "change",
+            "widget": {
+                "id": "sensitive_area",
+                "type": "text_area",
+                "label": "Sensitive Text Area",
+                "values": {"current": "[REDACTED]"},
+            },
+        }
+    ]
 
-    log_json = widget_logs[0]
-
-    # Verify the value is redacted, not the actual input
-    assert log_json["widget"]["values"]["current"] == "[REDACTED]"
-    assert "confidential information" not in log_stream.getvalue()
+    run_widget_interaction_test(
+        widget_interaction, expected_log, mask_text_input_values=True
+    )
 
 
 def test_text_input_not_masked_when_disabled() -> None:
     """Test text input values are NOT masked when mask_text_input_values=False."""
 
-    def app() -> None:
-        # pylint: disable=import-outside-toplevel
-        import streamlit as st
+    def widget_interaction() -> None:
+        def app() -> None:
+            # pylint: disable=import-outside-toplevel
+            import streamlit as st
 
-        st.text_input("Normal Input", key="normal_text")
+            st.text_input("Normal Input", key="normal_text")
 
-    log_stream = io.StringIO()
-    logger = logging.getLogger("test-no-mask-text-input")
-    logger.addHandler(logging.StreamHandler(log_stream))
-
-    with StreamlitPageAnalytics.track(
-        name="test-app",
-        session_id="test-session",
-        user_id="test-user",
-        logger=logger,
-        mask_text_input_values=False,
-    ):
         at = AppTest.from_function(app)
         at.run()
 
@@ -141,36 +108,33 @@ def test_text_input_not_masked_when_disabled() -> None:
         text_input.set_value("visible text value")
         at.run()
 
-    log_lines = log_stream.getvalue().splitlines()
-    widget_logs = _filter_widget_logs(log_lines)
-    assert len(widget_logs) == 1, f"Expected 1 widget log, got {len(widget_logs)}"
+    expected_log = [
+        {
+            "action": "change",
+            "widget": {
+                "id": "normal_text",
+                "type": "text_input",
+                "label": "Normal Input",
+                "values": {"current": "visible text value"},
+            },
+        }
+    ]
 
-    log_json = widget_logs[0]
-
-    # Verify the actual value is logged
-    assert log_json["widget"]["values"]["current"] == "visible text value"
+    run_widget_interaction_test(
+        widget_interaction, expected_log, mask_text_input_values=False
+    )
 
 
 def test_other_widgets_not_affected_by_masking() -> None:
     """Test that other widgets (selectbox) are not affected by masking."""
 
-    def app() -> None:
-        # pylint: disable=import-outside-toplevel
-        import streamlit as st
+    def widget_interaction() -> None:
+        def app() -> None:
+            # pylint: disable=import-outside-toplevel
+            import streamlit as st
 
-        st.selectbox("Choose Option", options=["Option A", "Option B"], key="select")
+            st.selectbox("Choose Option", options=["Option A", "Option B"], key="select")
 
-    log_stream = io.StringIO()
-    logger = logging.getLogger("test-other-widgets")
-    logger.addHandler(logging.StreamHandler(log_stream))
-
-    with StreamlitPageAnalytics.track(
-        name="test-app",
-        session_id="test-session",
-        user_id="test-user",
-        logger=logger,
-        mask_text_input_values=True,
-    ):
         at = AppTest.from_function(app)
         at.run()
 
@@ -178,11 +142,18 @@ def test_other_widgets_not_affected_by_masking() -> None:
         selectbox.set_value("Option B")
         at.run()
 
-    log_lines = log_stream.getvalue().splitlines()
-    widget_logs = _filter_widget_logs(log_lines)
-    assert len(widget_logs) == 1, f"Expected 1 widget log, got {len(widget_logs)}"
+    expected_log = [
+        {
+            "action": "change",
+            "widget": {
+                "id": "select",
+                "type": "selectbox",
+                "label": "Choose Option",
+                "values": {"current": "Option B"},
+            },
+        }
+    ]
 
-    log_json = widget_logs[0]
-
-    # Verify selectbox value is NOT masked
-    assert log_json["widget"]["values"]["current"] == "Option B"
+    run_widget_interaction_test(
+        widget_interaction, expected_log, mask_text_input_values=True
+    )
