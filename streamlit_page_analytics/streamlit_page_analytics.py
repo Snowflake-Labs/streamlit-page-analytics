@@ -79,6 +79,7 @@ class StreamlitPageAnalytics:
     _user_id: str
     _log_level: int
     _mask_text_input_values: bool
+    _mask_all_values: bool
 
     def __init__(
         self,
@@ -89,6 +90,7 @@ class StreamlitPageAnalytics:
         log_level: int = logging.INFO,
         logger: Optional[logging.Logger] = None,
         mask_text_input_values: bool = False,
+        mask_all_values: bool = False,
     ) -> None:
         """Initialize the StreamlitPageAnalytics instance.
 
@@ -104,6 +106,8 @@ class StreamlitPageAnalytics:
                 If not provided, a new logger will be created.
             mask_text_input_values: If True, text input and text area values will be
                 replaced with "[REDACTED]" in the logs. Defaults to False.
+            mask_all_values: If True, all widget values will be replaced with
+                "[REDACTED]" in the logs. Defaults to False.
         """
         self._original_mappings = {}
         self._name = name
@@ -113,6 +117,7 @@ class StreamlitPageAnalytics:
         self._logger = logger if logger else logging.getLogger(name)
         self._logger.setLevel(log_level)
         self._mask_text_input_values = mask_text_input_values
+        self._mask_all_values = mask_all_values
 
     def __enter__(self) -> "StreamlitPageAnalytics":
         """Enter the context manager and start tracking.
@@ -148,6 +153,7 @@ class StreamlitPageAnalytics:
         log_level: int = logging.INFO,
         logger: Optional[logging.Logger] = None,
         mask_text_input_values: bool = False,
+        mask_all_values: bool = False,
     ) -> "StreamlitPageAnalytics":
         """Create a new StreamlitPageAnalytics instance for use as a context manager.
 
@@ -163,6 +169,8 @@ class StreamlitPageAnalytics:
                 If not provided, a new logger will be created.
             mask_text_input_values: If True, text input and text area values will be
                 replaced with "[REDACTED]" in the logs. Defaults to False.
+            mask_all_values: If True, all widget values will be replaced with
+                "[REDACTED]" in the logs. Defaults to False.
 
         Returns:
             A new StreamlitPageAnalytics instance configured with the provided
@@ -183,6 +191,7 @@ class StreamlitPageAnalytics:
             log_level=log_level,
             logger=logger,
             mask_text_input_values=mask_text_input_values,
+            mask_all_values=mask_all_values,
         )
 
     def log_event(self, partial_event: UserEvent) -> None:
@@ -309,6 +318,7 @@ class StreamlitPageAnalytics:
                     # pylint: disable=unnecessary-lambda
                     session_state_fn=lambda: st.session_state.to_dict(),
                     mask_text_input_values=self._mask_text_input_values,
+                    mask_all_values=self._mask_all_values,
                 )
 
                 self._logger.debug(

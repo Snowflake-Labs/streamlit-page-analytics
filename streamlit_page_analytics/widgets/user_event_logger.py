@@ -29,6 +29,7 @@ class UserEventLogger:
     _logger_fn: Optional[Callable[[UserEvent], None]] = None
     _session_state_fn: Optional[Callable[[], dict[str, Any]]] = None
     _mask_text_input_values: bool = False
+    _mask_all_values: bool = False
 
     # Widget types that should have their values masked when masking is enabled
     _TEXT_INPUT_WIDGET_TYPES = frozenset({"text_input", "text_area"})
@@ -42,6 +43,7 @@ class UserEventLogger:
         logger_fn: Optional[Callable] = None,
         session_state_fn: Optional[Callable[[], dict[str, Any]]] = None,
         mask_text_input_values: bool = False,
+        mask_all_values: bool = False,
     ) -> None:
         """Initialize the UserEventLoggerFn."""
         self._widget = widget
@@ -50,6 +52,7 @@ class UserEventLogger:
         self._logger_fn = logger_fn
         self._session_state_fn = session_state_fn
         self._mask_text_input_values = mask_text_input_values
+        self._mask_all_values = mask_all_values
 
     def logging_callback_fn(self, *args: List[Any], **kwargs: Dict[str, Any]) -> Any:
         """Log user action and calls the original callback if present."""
@@ -81,7 +84,7 @@ class UserEventLogger:
                 widget_value = self._session_state_fn()[self._widget.id]
                 if widget_value is not None:
                     # Mask text input values if enabled
-                    if (
+                    if self._mask_all_values or (
                         self._mask_text_input_values
                         and self._widget.type in self._TEXT_INPUT_WIDGET_TYPES
                     ):
