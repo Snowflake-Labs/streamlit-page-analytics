@@ -41,6 +41,12 @@ dependencies = [
     "streamlit >= 1.11.1",
 ]
 
+[tool.uv]
+constraint-dependencies = [
+    "pillow>=12.1.1",
+    "tornado>=6.5.5",
+]
+
 [project.urls]
 "Homepage" = "https://github.com/Snowflake-Labs/streamlit-page-analytics"
 "Bug Tracker" = "https://github.com/Snowflake-Labs/streamlit-page-analytics/issues"
@@ -58,7 +64,7 @@ dev = [
     "pytest>=7.0",
     "pytest-cov",
     "pytest-mock>=3.12.0",
-    "black>=25.1.0",
+    "black>=26.3.1",
     "isort",
     "flake8",
     "pylint",
@@ -80,7 +86,7 @@ test = [
 
 # Linting and formatting dependencies only  
 lint = [
-    "black>=25.1.0",
+    "black>=26.3.1",
     "isort",
     "flake8",
     "pylint",
