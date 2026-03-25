@@ -68,7 +68,7 @@ jobs:
         run: echo "${{ steps.safety_scan.outputs.stdout }}" > safety-report.json
 
       - name: Upload Safety report
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: safety-security-report
@@ -112,7 +112,7 @@ jobs:
           uv run pip-audit --format=json --output=pip-audit-report.json || true
 
       - name: Upload pip-audit report
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: pip-audit-report
@@ -128,7 +128,7 @@ jobs:
 
     steps:
       - name: Download all security reports
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           path: security-reports
 

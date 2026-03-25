@@ -71,7 +71,7 @@ jobs:
         ls -la dist/
 
     - name: Upload distributions as artifacts
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       with:
         name: distributions
         path: dist/
