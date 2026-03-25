@@ -33,6 +33,16 @@ MAPPINGS = [
         },
         action_type=UserEventAction.CLICK,
     ),
+    # https://docs.streamlit.io/develop/api-reference/execution-flow/st.form_submit_button
+    WidgetMapping(
+        st_widget_name="form_submit_button",
+        extraction_attributes={
+            "label": WidgetAttribute(index=0, name="label"),
+            "key": WidgetAttribute(index=999, name="key"),
+            "action": WidgetAttribute(index=2, name="on_click"),
+        },
+        action_type=UserEventAction.SUBMIT,
+    ),
     # https://docs.streamlit.io/develop/api-reference/widgets/st.checkbox
     WidgetMapping(
         st_widget_name="checkbox",

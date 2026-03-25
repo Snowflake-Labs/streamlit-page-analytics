@@ -22,6 +22,8 @@ class UserEventAction(Enum):
     tracked within a Streamlit application.
 
     Attributes:
+        START_TRACKING: Page tracking started (when using page names).
+        FORM_INSTRUMENTATION_NOTICE: One-time notice about form widget instrumentation.
         CLICK: User clicked on an element (e.g., button, link).
         CHANGE: User changed a value (e.g., slider, input field).
         SUBMIT: User submitted a form or triggered a submission action.
@@ -29,6 +31,7 @@ class UserEventAction(Enum):
     """
 
     START_TRACKING = "start_tracking"
+    FORM_INSTRUMENTATION_NOTICE = "form_instrumentation_notice"
     CLICK = "click"
     CHANGE = "change"
     SUBMIT = "submit"  # noqa: F841  # vulture: ignore - used in form submissions

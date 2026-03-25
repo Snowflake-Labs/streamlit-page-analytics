@@ -15,7 +15,7 @@
 import logging
 from typing import Any, Callable, Dict, List, Optional
 
-from streamlit_page_analytics.models import UserEvent, UserEventAction, Widget
+from ..models import UserEvent, UserEventAction, Widget
 
 
 class UserEventLogger:
