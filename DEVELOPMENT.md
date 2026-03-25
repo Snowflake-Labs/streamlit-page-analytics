@@ -143,6 +143,23 @@ task clean
 task help
 ```
 
+### Testing and JSON log assertions
+
+Integration tests under `tests/` use **`tests/testing_framework.run_widget_interaction_test`**. It:
+
+1. Runs `StreamlitPageAnalytics.track(...)` with a logger whose output is captured to a string buffer.
+2. Executes your `test_code()` (typically [Streamlit AppTest](https://docs.streamlit.io/develop/api-reference/app-testing) driving widgets).
+3. Parses **JSON log lines**, skipping **`action`: `start_tracking`** (page-tracking lines are not asserted by this helper unless you inspect the raw buffer separately).
+4. Zips each parsed object with an **expected** dict and compares `session_id`, `user_id`, optional `action`, optional `widget` fields, optional **`extra`**, and optional **`widget.values`** when the test specifies them.
+
+**Valid analytics rows:** every captured line must carry **widget-related or form-related** data, enforced by `_has_widget_or_form_payload` in `tests/testing_framework.py`:
+
+- a non-empty **`widget`** object, **or**
+- **`action`** equal to **`form_instrumentation_notice`**, **or**
+- **`extra`** containing **`form_id`** or **`form_fields`**.
+
+If you add a new event shape that is neither a widget row nor one of the form patterns above, extend that helper and this section so tests and docs stay aligned.
+
 ## Troubleshooting
 
 ### Pre-Commit Hook Issues
@@ -272,6 +289,7 @@ task test-cov
 
 ## 🔗 Related Documentation
 
+- **[README.md](./README.md)** - User-facing behavior, log format, and forms
 - **[LINTING.md](./LINTING.md)** - Detailed linter configuration
 - **[.github/workflows/lint.yml](./.github/workflows/lint.yml)** - GitHub workflow
 - **[Taskfile](./Taskfile.yaml)** - Available commands

@@ -133,16 +133,22 @@ tasks:
 
   test:
     desc: Run tests (matches CI environment)
+    deps:
+      - install
     cmds:
       - echo "Running tests..."
-      - uv run pytest {{.TESTS_DIR}}/ -v
+      # Use `python -m pytest` so the project venv is used; `uv run pytest` can
+      # resolve to a global pytest without the editable package on PYTHONPATH.
+      - uv run python -m pytest {{.TESTS_DIR}}/ -v
 
   test-cov:
     desc: Run tests with coverage
+    deps:
+      - install
     cmds:
       - |
         echo "Running tests with coverage..."
-        uv run pytest {{.TESTS_DIR}}/ -v \
+        uv run python -m pytest {{.TESTS_DIR}}/ -v \
           --cov={{.SOURCE_DIR}} \
           --cov-report=term-missing \
           --cov-report=html \

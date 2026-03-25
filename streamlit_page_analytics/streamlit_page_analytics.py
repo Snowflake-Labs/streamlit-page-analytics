@@ -21,7 +21,7 @@ automatically capture analytics events when users interact with them.
 
 import json
 import logging
-from typing import Any, Callable, Dict, Optional
+from typing import Any, Callable, Dict, Literal, Optional, cast
 
 import streamlit as st
 
@@ -31,7 +31,7 @@ from .utils import clean_values
 from .widgets import WrappedWidget
 
 
-class StreamlitPageAnalytics:
+class StreamlitPageAnalytics:  # pylint: disable=too-many-instance-attributes
     """Main class for tracking analytics in Streamlit applications.
 
     This class provides functionality to automatically track user interactions
@@ -70,6 +70,12 @@ class StreamlitPageAnalytics:
         >>> analytics.start_tracking()
         >>> st.button("Click me")  # This will be tracked
         >>> analytics.stop_tracking()
+
+    Note:
+        Each emitted record is a JSON object. :meth:`log_event` attaches
+        ``session_id`` and ``user_id`` (and ``page_name`` when set) to
+        ``UserEvent`` payloads. Forms: see the README for
+        ``form_instrumentation_notice``, ``submit``, and ``extra.form_fields``.
     """
 
     _logger: logging.Logger
@@ -323,6 +329,11 @@ class StreamlitPageAnalytics:
                     event_logger_fn=self.log_event,
                     # pylint: disable=unnecessary-lambda
                     session_state_fn=lambda: st.session_state.to_dict(),
+                    analytics_name=self._name,
+                    parent_logger=self._logger,
+                    streamlit_container_name=cast(
+                        Literal["st", "st.sidebar"], container_name
+                    ),
                     mask_text_input_values=self._mask_text_input_values,
                     mask_all_values=self._mask_all_values,
                 )

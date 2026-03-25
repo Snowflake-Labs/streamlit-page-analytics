@@ -44,7 +44,19 @@ def _filter_widget_logs(log_lines: list[str]) -> list[dict]:
     return result
 
 
-def run_widget_interaction_test(
+def _has_widget_or_form_payload(log_json: dict) -> bool:
+    """True if the log line has widget data or form snapshot / notice payload."""
+    if log_json.get("widget"):
+        return True
+    if log_json.get("action") == "form_instrumentation_notice":
+        return True
+    extra = log_json.get("extra")
+    if isinstance(extra, dict) and ("form_fields" in extra or "form_id" in extra):
+        return True
+    return False
+
+
+def run_widget_interaction_test(  # pylint: disable=too-many-locals
     test_code: Callable[[], None],
     expected_log_lines: list[Dict[str, Any]],
     **analytics_kwargs: Any,
@@ -67,7 +79,9 @@ def run_widget_interaction_test(
     logger = analytics_kwargs.pop("logger", None)
     if logger is None:
         logger = logging.getLogger("test-logger")
-        logger.addHandler(logging.StreamHandler(log_stream))
+    logger.handlers.clear()
+    logger.addHandler(logging.StreamHandler(log_stream))
+    logger.setLevel(logging.INFO)
 
     name = analytics_kwargs.pop("name", _TEST_APP_NAME)
     session_id = analytics_kwargs.pop("session_id", _TEST_SESSION_ID)
@@ -90,6 +104,12 @@ def run_widget_interaction_test(
     ), f"Expected {len(expected_log_lines)} log lines, got {len(widget_logs)}"
 
     for log_json, expected_log_line in zip(widget_logs, expected_log_lines):
+        assert _has_widget_or_form_payload(log_json), (
+            "Each log line must include a widget or form payload (widget, "
+            "form_instrumentation_notice, or extra with form_id/form_fields): "
+            f"{log_json!r}"
+        )
+
         _assert_equals(
             expected=session_id,
             actual=log_json["session_id"],
@@ -127,28 +147,43 @@ def run_widget_interaction_test(
                 field_name="label",
             )
 
-        if "previous" in log_json["widget"]["values"]:
+        if "extra" in expected_log_line:
+            assert "extra" in log_json, "extra not found in log"
+            for key, expected_val in expected_log_line["extra"].items():
+                _assert_equals(
+                    expected=expected_val,
+                    actual=log_json["extra"][key],
+                    field_name=f"extra.{key}",
+                )
+
+        widget = log_json.get("widget")
+        if not widget:
+            continue
+
+        widget_vals = widget.get("values") or {}
+        if "previous" in widget_vals:
             assert False, "previous found in element.values"
 
-        if "values" in expected_log_line["widget"]:
-            assert "values" in log_json["widget"], "values not found in element"
+        exp_widget = expected_log_line.get("widget") or {}
+        if "values" in exp_widget:
+            assert "values" in widget, "values not found in element"
 
-            if "previous" in expected_log_line["widget"]["values"]:
+            if "previous" in exp_widget["values"]:
                 assert (
-                    "previous" in log_json["widget"]["values"]
+                    "previous" in widget["values"]
                 ), "previous not found in element.values"
                 _assert_equals(
-                    expected=expected_log_line["widget"]["values"]["previous"],
-                    actual=log_json["widget"]["values"]["previous"],
+                    expected=exp_widget["values"]["previous"],
+                    actual=widget["values"]["previous"],
                     field_name="element.values.previous",
                 )
 
-            if "current" in expected_log_line["widget"]["values"]:
+            if "current" in exp_widget["values"]:
                 assert (
-                    "current" in log_json["widget"]["values"]
+                    "current" in widget["values"]
                 ), "current not found in element.values"
                 _assert_equals(
-                    expected=expected_log_line["widget"]["values"]["current"],
-                    actual=log_json["widget"]["values"]["current"],
+                    expected=exp_widget["values"]["current"],
+                    actual=widget["values"]["current"],
                     field_name="element.values.current",
                 )

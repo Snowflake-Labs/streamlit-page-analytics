@@ -155,7 +155,12 @@ run_linter() {
             output=$(uv run flake8 "$SOURCE_DIR" 2>&1) || result=$?
             ;;
         pylint)
-            output=$(uv run pylint "$SOURCE_DIR" 2>&1) || result=$?
+            # duplicate-code (R0801): suppress only for tests/ (similar AppTest patterns).
+            pylint_args=("$SOURCE_DIR")
+            if [[ "$(basename "$SOURCE_DIR")" == "tests" ]]; then
+                pylint_args=(--disable=R0801 "${pylint_args[@]}")
+            fi
+            output=$(uv run pylint "${pylint_args[@]}" 2>&1) || result=$?
             ;;
         mypy)
             output=$(uv run mypy "$SOURCE_DIR" 2>&1) || result=$?
