@@ -1818,7 +1818,7 @@ requires-dist = [
     { name = "pytest-cov", marker = "extra == 'test'" },
     { name = "pytest-mock", marker = "extra == 'dev'", specifier = ">=3.12.0" },
     { name = "pytest-mock", marker = "extra == 'test'", specifier = ">=3.12.0" },
-    { name = "streamlit", specifier = ">=1.11.1" },
+    { name = "streamlit", specifier = ">=1.50.0" },
     { name = "vulture", marker = "extra == 'dev'" },
     { name = "vulture", marker = "extra == 'security'" },
 ]
