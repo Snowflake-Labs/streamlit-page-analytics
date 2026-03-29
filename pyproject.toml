@@ -38,7 +38,7 @@ classifiers = [
 ]
 
 dependencies = [
-    "streamlit >= 1.11.1",
+    "streamlit >= 1.50.0",
 ]
 
 [tool.uv]
